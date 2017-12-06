@@ -5,18 +5,18 @@
 var express = require('express');
 var app = express();
 
-var months = [{index:1,short:"Jan",long:"January"},
-             {index:2,short:"Feb",long:"February"},
-             {index:3,short:"Mar",long:"March"},
-             {index:4,short:"Apr",long:"April"},
-             {index:5,short:"May",long:"May"},
-             {index:6,short:"Jun",long:"June"},
-             {index:7,short:"Jul",long:"July"},
-             {index:8,short:"Aug",long:"August"},
-             {index:9,short:"Sep",long:"September"},
-             {index:10,short:"Oct",long:"October"},
-             {index:11,short:"Nov",long:"November"},
-             {index:12,short:"Dec",long:"December"}];
+var months = [{index:1,short:"jan",long:"january"},
+             {index:2,short:"feb",long:"february"},
+             {index:3,short:"mar",long:"march"},
+             {index:4,short:"apr",long:"april"},
+             {index:5,short:"may",long:"may"},
+             {index:6,short:"jun",long:"june"},
+             {index:7,short:"jul",long:"july"},
+             {index:8,short:"aug",long:"august"},
+             {index:9,short:"sep",long:"september"},
+             {index:10,short:"oct",long:"october"},
+             {index:11,short:"nov",long:"november"},
+             {index:12,short:"dec",long:"december"}];
 // we've started you off with Express, 
 // but feel free to use whatever libs or frameworks you'd like through `package.json`.
 
@@ -34,10 +34,31 @@ app.get("/:id",function(req,res){
   
   var query = req.params.id;
   var result = {unixtime:null,natural:null};
-  console.log("12334".search(/^\d+$/));
   if(query.search(/^\d+$/)>=0){
-    console.log("success");
+    var date = new Date(parseInt(query,10));
+    
     result.unixtime = parseInt(query,10);
+    
+    result.natural = months[date.getMonth()].long + " "+date.getDate()+","+date.getFullYear();
+  }else if(query.search(/^(\w+) (\w{1,2})[ ,](\w{4})$/)>=0){
+    var match = query.match(/^(\w+) (\w{1,2})[ ,](\w{4})$/);
+    
+    var month = 0;
+    var date = 0;
+    var year = 0;
+    
+    months.forEach(function(e){
+      if(match[1].toLowerCase()==e.short||match[1].toLowerCase()==e.long){
+         month = e.index;
+      }
+    })
+    
+    date = parseInt(match[2],10);
+    year = parseInt(match[3],10);
+    
+    var date = new Date(year,month-1,date);
+    result.unixtime= date.getTime();
+    result.natural = match[0];
   }
   res.send(result);
   
